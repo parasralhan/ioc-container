@@ -1,0 +1,22 @@
+{
+    "name": "bonzer/ioc-container",
+    "description": "Inversion of Control Container - facilitating Interface Oriented Design",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Paras Ralhan",
+            "email": "ralhan.paras@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+      "php": ">=5.4.0",
+      "bonzer/exceptions": "dev-master"
+    },
+    "autoload": {
+      "psr-4": {
+        "Bonzer\\IOC_Container\\": "src/"
+      }
+    }
+}

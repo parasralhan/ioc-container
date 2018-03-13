@@ -1,12 +1,11 @@
 <?php
+namespace Bonzer\IOC_Container\facades;
 /**
  * IOC Container Static Caller
  * 
  * @package bonzer/ioc-container    
  * @author  Paras Ralhan <ralhan.paras@gmail.com>
  */
-
-namespace Bonzer\IOC_Container\facades;
 
 use Bonzer\IOC_Container\Container as IOC_Container;
 class Container extends \Bonzer\IOC_Container\contracts\Facade_Abstract {

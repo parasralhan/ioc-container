@@ -8,10 +8,10 @@
 
 namespace Bonzer\IOC_Container;
 
-use Bonzer\exceptions\Invalid_Param_Exception,
-    Bonzer\exceptions\Instantiating_Abstract_Class_Exception,
-    Bonzer\exceptions\Instantiating_Non_Instantiable_Class_Exception,
-    Bonzer\exceptions\Key_Exists_Exception;
+use Bonzer\Exceptions\Invalid_Param_Exception,
+    Bonzer\Exceptions\Instantiating_Abstract_Class_Exception,
+    Bonzer\Exceptions\Instantiating_Non_Instantiable_Class_Exception,
+    Bonzer\Exceptions\Key_Exists_Exception;
 use Closure;
 
 class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container{

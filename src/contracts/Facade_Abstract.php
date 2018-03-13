@@ -8,7 +8,7 @@
 
 namespace Bonzer\IOC_Container\contracts;
 
-use Bonzer\exceptions\Base_Exception;
+use Bonzer\Exceptions\Base_Exception;
 
 abstract class Facade_Abstract {
 

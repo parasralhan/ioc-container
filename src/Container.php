@@ -10,11 +10,10 @@ namespace Bonzer\IOC_Container;
 
 use Bonzer\Exceptions\Invalid_Param_Exception,
     Bonzer\Exceptions\Instantiating_Abstract_Class_Exception,
-    Bonzer\Exceptions\Instantiating_Non_Instantiable_Class_Exception,
-    Bonzer\Exceptions\Key_Exists_Exception;
+    Bonzer\Exceptions\Instantiating_Non_Instantiable_Class_Exception;
 use Closure;
 
-class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container{
+class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container {
 
   protected static $_instance;
 
@@ -90,10 +89,12 @@ class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container{
    * @Return void 
    * */
   public function bind( $key, $binding ) {
-    if ( array_key_exists( $key, $this->_bindings ) ) {
-      throw new Key_Exists_Exception( "Binding {$key} already in use" );
-    }
-    $this->_bindings[ $key ] = $binding;
+//    if ( array_key_exists( $key, $this->_bindings ) ) {
+//      $this->_bindings[ $key ][] = $binding;
+//    } else {
+//      $this->_bindings[ $key ] = [$binding];
+//    }
+    $this->_bindings[ $key ][] = $binding;
   }
 
   /**
@@ -108,7 +109,7 @@ class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container{
    * */
   public function singleton( $key, $binding ) {
     $this->bind( $key, $binding );
-    $this->_singletons[ $key ] = $binding;
+    $this->_singletons[ $key ][] = $binding;
   }
 
   /**
@@ -122,8 +123,10 @@ class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container{
    * @Return mixed 
    * */
   public function make( $key, $args = [ ] ) {
-
-    if ( array_key_exists( $key, $this->_bindings ) ) {
+    
+    if ( array_key_exists( $key, $this->_bindings ) ) { 
+      $total_bindings = count($this->_bindings[ $key ]);
+      $binding = $this->_bindings[ $key ][$total_bindings - 1];
 
       // Create Singleton
       if ( array_key_exists( $key, $this->_singletons ) ) {
@@ -131,20 +134,20 @@ class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container{
       }
 
       // if callback is bounded, invoke it
-      if ( $this->_bindings[ $key ] instanceof Closure ) {
+      if ( $binding instanceof Closure ) {
         return call_user_func_array( $this->_bindings[ $key ], [$args ] );
       }
 
       // if object is directly bounded, resolve directly
-      if ( is_object( $this->_bindings[ $key ] ) ) {
-        return $this->_bindings[ $key ];
+      if ( is_object( $binding ) ) {
+        return $binding;
       }
 
       /* ==========================================================
        * If Binding is in form of string, 
        * pass the bounded string as class to resolve
        * ========================================================== */
-      return $this->resolve( $this->_bindings[ $key ] );
+      return $this->resolve( $binding );
     }
 
     // If not bounded, delegate to resolve method with key as class
@@ -172,20 +175,25 @@ class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container{
     if ( !array_key_exists( $key, $this->_singletons ) ) {
       $this->_singletons[ $key ] = $key;
     }
+    
+    if ( array_key_exists( $key, $this->_singletons )) {
+      $total_bindings = count($this->_singletons[ $key ]);
+      $binding = $this->_singletons[ $key ][$total_bindings - 1];
+    }
 
     // if callback is bounded, invoke it
-    if ( $this->_singletons[ $key ] instanceof Closure ) {
-      return $this->_singleton_instances[ $key ] = call_user_func_array( $this->_singletons[ $key ], [$args ] );
+    if ( $binding instanceof Closure ) {
+      return $this->_singleton_instances[ $key ] = call_user_func_array( $binding, [$args ] );
     }
 
     // If binding is in form of object
     // resigter is instance and return
-    if ( is_object( $this->_singletons[ $key ] ) ) {
-      return $this->_singleton_instances[ $key ] = $this->_singletons[ $key ];
+    if ( is_object( $binding ) ) {
+      return $this->_singleton_instances[ $key ] = $binding;
     }
 
     // Resolve the singleton
-    return $this->resolve( $this->_singletons[ $key ], TRUE );
+    return $this->resolve( $binding, TRUE );
   }
 
   /**
@@ -225,7 +233,9 @@ class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container{
       if ( !array_key_exists( $class, $this->_bindings ) ) {
         throw new Instantiating_Abstract_Class_Exception( "{$class} interface is not bounded" );
       }
-      $class = $this->_bindings[ $class ];
+      $total_bindings = count($this->_bindings[ $class ]);
+      $class = $this->_bindings[ $class ][$total_bindings - 1];
+      
       $reflector = new \ReflectionClass( $class );
     }
 

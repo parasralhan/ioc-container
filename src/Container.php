@@ -301,16 +301,38 @@ class Container implements \Bonzer\IOC_Container\contracts\interfaces\Container 
    * @Return array 
    * */
   protected function _dependencies( $parameters ) {
+
     $dependencies = [ ];
+
     foreach ( $parameters as $parameter ) {
-      $dependency = $parameter->getClass();
-      if ( is_null( $dependency ) ) {
+
+      if ( method_exists($parameter, 'getType') ) {
+
+        $dependency = $parameter->getType();
+        $built_in = $dependency->isBuiltin();
+        $class_name = $dependency->getName();
+
+      } else {
+
+        $dependency = $parameter->getClass();
+        $built_in = is_null( $dependency );
+
+        if ( !$built_in ) {
+          $class_name = $dependency->name;
+        }
+
+      }      
+
+      if ( $built_in ) {
         $dependencies[] = $this->_resolve_non_class( $parameter );
       } else {
-        $dependencies[] = $this->resolve( $dependency->name );
+        $dependencies[] = $this->resolve( $class_name );
       }
+
     }
+    
     return $dependencies;
+    
   }
 
   /**
